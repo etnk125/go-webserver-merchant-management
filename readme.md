@@ -1,4 +1,5 @@
-# 1st GO web server 
+# [GO lang] web server with 3-tier arch., using env config, testing, middleware-auth, write file and run as batch with flag option     
+### 1st GO web server 
 
 ## Run
 ```
