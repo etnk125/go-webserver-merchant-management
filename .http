@@ -1,0 +1,23 @@
+###
+
+GET http://localhost:8080/
+
+HTTP/1.1 200 OK
+Content-Type: text/html;charset=UTF-8
+Content-Length: 0
+
+
+### Health check
+
+GET http://localhost:8080/health
+
+
+### Register merchant
+
+POST http://localhost:8080/merchant
+
+{
+    "name": "Merchant 1",
+    "bank_account": "1234567890",
+}
+
