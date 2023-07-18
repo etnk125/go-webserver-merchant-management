@@ -18,17 +18,17 @@ go run main.go
 
 ## API route in table
 
-| Method | Route                                | Body [JSON]        | Auth  | Description                    | status |
-| ------ | ------------------------------------ | ------------------ | ----- | ------------------------------ | ------ |
-| GET    | `/`                                  |                    | False | Health check                   | ✅      |
-| GET    | `/health`                            |                    | False | Health check                   | ✅      |
-| POST   | `/merchant`                          | name, bank_account | False | Register merchant              | ✅      |
-| GET    | `/merchant/:merchant_id`             | name, bank_account | True  | Get merchant info              | 🟨      |
-| PUT    | `/merchant/:merchant_id`             | name, bank_account | True  | Update merchant info           | 🟨      |
-| POST   | `/merchant/:merchant_id/product`     | name, price        | True  | Add product to that merchant   | ⛔      |
-| GET    | `/merchant/:merchant_id/product/all` |                    | True  | Get products of that merchant  | ⛔      |
-| POST   | `/product/:product_id`               | quantity           | False | Buy product from that merchant | ⛔      |
-| GET    | `/sell-report/:date`                 |                    | True  | Get sell report                | ⛔      |
+| Method | Route                                | Body [JSON]        | Auth  | Description                    | service utest |
+| ------ | ------------------------------------ | ------------------ | ----- | ------------------------------ | ------------- |
+| GET    | `/`                                  |                    | False | Health check                   | ✅             |
+| GET    | `/health`                            |                    | False | Health check                   | ✅             |
+| POST   | `/merchant`                          | name, bank_account | False | Register merchant              | ✅             |
+| GET    | `/merchant/:merchant_id`             | name, bank_account | True  | Get merchant info              | ✅             |
+| PUT    | `/merchant/:merchant_id`             | name, bank_account | True  | Update merchant info           | ✅             |
+| POST   | `/merchant/:merchant_id/product`     | name, price        | True  | Add product to that merchant   | ⛔             |
+| GET    | `/merchant/:merchant_id/product/all` |                    | True  | Get products of that merchant  | ⛔             |
+| POST   | `/product/:product_id`               | quantity           | False | Buy product from that merchant | ⛔             |
+| GET    | `/sell-report/:date`                 |                    | True  | Get sell report                | ⛔             |
 
 
 
