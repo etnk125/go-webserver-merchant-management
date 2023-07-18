@@ -54,11 +54,13 @@ func (c *Controller) UpdateMerchantInfo(ctx echo.Context) error {
 	if err := ctx.Bind(req); err != nil {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
-
 	// update merchant info
-	c.merchantService.UpdateMerchantInfo(merchantID, req)
 
-	return ctx.JSON(http.StatusOK, "JSON")
+	merchant, err := c.merchantService.GetMerchantInfo(merchantID)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+	return ctx.JSON(http.StatusOK, merchant)
 }
 
 func (c *Controller) AddProduct(ctx echo.Context) error {

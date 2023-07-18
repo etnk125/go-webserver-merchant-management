@@ -13,6 +13,7 @@ type merchantRepo interface {
 	GetDefaultCredential() *model.Credential
 	CreateMerchant(merchant *model.Merchant) (*model.Merchant, error)
 	GetMerchantInfo(id string) (*model.Merchant, error)
+	UpdateMerchantInfo(merchantID string, req *model.UpdateMerchantRequest) (*model.Merchant, error)
 }
 
 func NewMerchantService(repo merchantRepo) *MerchantService {
@@ -20,7 +21,6 @@ func NewMerchantService(repo merchantRepo) *MerchantService {
 		repo: repo,
 	}
 }
-
 func (s *MerchantService) RegisterMerchant(req *model.RegisterMerchantRequest) (*model.Merchant, error) {
 	uuid := uuid.New().String()
 
@@ -36,20 +36,19 @@ func (s *MerchantService) RegisterMerchant(req *model.RegisterMerchantRequest) (
 
 	return s.repo.CreateMerchant(merchant)
 }
-
 func (s *MerchantService) GetMerchantInfo(id string) (*model.Merchant, error) {
 	return s.repo.GetMerchantInfo(id)
 }
-
 func (s *MerchantService) UpdateMerchantInfo(id string, req *model.UpdateMerchantRequest) (*model.Merchant, error) {
 	merchant, err := s.repo.GetMerchantInfo(id)
 	if err != nil {
 		return nil, err
 	}
 
-	merchant, err = s.repo.UpdateMerchantInfo(merchant, req)
+	merchant, err = s.repo.UpdateMerchantInfo(merchant.ID, req)
 	if err != nil {
 		return nil, err
 	}
+	return merchant, nil
 
 }

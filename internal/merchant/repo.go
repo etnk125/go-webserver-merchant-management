@@ -19,12 +19,10 @@ func NewMerchantRepository() *MerchantRepository {
 func (r *MerchantRepository) GetDefaultCredential() *model.Credential {
 	return &r.DefaultCredential
 }
-
 func (r *MerchantRepository) CreateMerchant(merchant *model.Merchant) (*model.Merchant, error) {
 	r.Merchants[merchant.ID] = merchant
 	return merchant, nil
 }
-
 func (r *MerchantRepository) GetMerchantInfo(id string) (*model.Merchant, error) {
 	merchant, ok := r.Merchants[id]
 	if !ok {
@@ -32,7 +30,6 @@ func (r *MerchantRepository) GetMerchantInfo(id string) (*model.Merchant, error)
 	}
 	return merchant, nil
 }
-
 func (r *MerchantRepository) UpdateMerchantInfo(id string, req *model.UpdateMerchantRequest) (*model.Merchant, error) {
 	merchant, err := r.GetMerchantInfo(id)
 	if err != nil {

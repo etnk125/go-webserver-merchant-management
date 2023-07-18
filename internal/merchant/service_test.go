@@ -7,12 +7,12 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-type MockMerchantRepository struct {
+type MerchantRepositoryMock struct {
 	model.MemoryDB
 }
 
-func NewMockMerchantRepository() *MockMerchantRepository {
-	return &MockMerchantRepository{
+func NewMerchantRepositoryMock() *MerchantRepositoryMock {
+	return &MerchantRepositoryMock{
 		MemoryDB: model.MemoryDB{
 			Merchants:         make(map[string]*model.Merchant),
 			Products:          make(map[string]*model.Product),
@@ -22,20 +22,43 @@ func NewMockMerchantRepository() *MockMerchantRepository {
 	}
 }
 
-func (r *MockMerchantRepository) GetDefaultCredential() *model.Credential {
+func (r *MerchantRepositoryMock) GetDefaultCredential() *model.Credential {
 	return &r.DefaultCredential
 }
 
-func (r *MockMerchantRepository) CreateMerchant(merchant *model.Merchant) (*model.Merchant, error) {
+func (r *MerchantRepositoryMock) CreateMerchant(merchant *model.Merchant) (*model.Merchant, error) {
 	r.Merchants[merchant.ID] = merchant
 	return merchant, nil
 }
-
-func (r *MockMerchantRepository) GetMerchantInfo(id string) (*model.Merchant, error) {
+func (r *MerchantRepositoryMock) GetMerchantInfo(id string) (*model.Merchant, error) {
 	merchant, ok := r.Merchants[id]
 	if !ok {
 		return nil, ErrMerchantNotFound()
 	}
+	return merchant, nil
+}
+func (r *MerchantRepositoryMock) UpdateMerchantInfo(id string, req *model.UpdateMerchantRequest) (*model.Merchant, error) {
+	merchant, err := r.GetMerchantInfo(id)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Name != "" {
+		merchant.Name = req.Name
+	}
+
+	if req.BankAccount != "" {
+		merchant.BankAccount = req.BankAccount
+	}
+
+	if req.Username != "" {
+		merchant.Username = req.Username
+	}
+
+	if req.Password != "" {
+		merchant.Password = req.Password
+	}
+
 	return merchant, nil
 }
 
@@ -64,7 +87,7 @@ func TestService_RegisterMerchant(t *testing.T) {
 	}
 	for name, tc := range tcs {
 		t.Run(name, func(t *testing.T) {
-			repo := NewMockMerchantRepository()
+			repo := NewMerchantRepositoryMock()
 			svc := NewMerchantService(repo)
 			actual, err := svc.RegisterMerchant(tc.req)
 
@@ -107,7 +130,7 @@ func TestService_GetMerchantInfo(t *testing.T) {
 	}
 	for name, tc := range tcs {
 		t.Run(name, func(t *testing.T) {
-			repo := NewMockMerchantRepository()
+			repo := NewMerchantRepositoryMock()
 			repo.Merchants["test_id"] = &model.Merchant{
 				ID:          "test_id",
 				Name:        "test_name",
@@ -125,3 +148,56 @@ func TestService_GetMerchantInfo(t *testing.T) {
 		})
 	}
 }
+
+func TestService_UpdateMerchantInfo(t *testing.T) {
+	type testCase struct {
+		id       string
+		req      *model.UpdateMerchantRequest
+		expected *model.Merchant
+		err      error
+	}
+	tcs := map[string]testCase{
+		"should return correct merchant info": {
+			id: "test_id",
+			req: &model.UpdateMerchantRequest{
+				Name:        "test_name",
+				BankAccount: "test_bank_account",
+				Username:    "test_username",
+				Password:    "test_password",
+			},
+			expected: &model.Merchant{
+				ID:          "test_id",
+				Name:        "test_name",
+				BankAccount: "test_bank_account",
+				Username:    "test_username",
+				Password:    "test_password",
+			},
+			err: nil,
+		},
+		"should return error when merchant not found": {
+			id:       "not_found_id",
+			expected: nil,
+			err:      ErrMerchantNotFound(),
+		},
+	}
+	for name, tc := range tcs {
+		t.Run(name, func(t *testing.T) {
+			repo := NewMerchantRepositoryMock()
+			repo.Merchants["test_id"] = &model.Merchant{
+				ID:          "test_id",
+				Name:        "test_name_before_update",
+				BankAccount: "test_bank_account_before_update",
+				Username:    "test_username_before_update",
+				Password:    "test_password_before_update",
+			}
+			svc := NewMerchantService(repo)
+			actual, err := svc.UpdateMerchantInfo(tc.id, tc.req)
+
+			// err
+			assert.Equal(t, tc.err, err)
+			// merchant
+			assert.Equal(t, tc.expected, actual)
+		})
+	}
+}
+
