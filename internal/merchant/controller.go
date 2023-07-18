@@ -10,8 +10,8 @@ import (
 type merchantService interface {
 	RegisterMerchant(req *model.RegisterMerchantRequest) (*model.Merchant, error)
 	GetMerchantInfo(id string) (*model.Merchant, error)
-	UpdateMerchantInfo(id string, req *model.UpdateMerchantRequest) error
-	AddProduct(id string, req *model.AddProductRequest) (*model.Product, error)
+	UpdateMerchantInfo(id string, req *model.UpdateMerchantRequest) (*model.Merchant, error)
+	AddProduct(id string, req model.AddProductRequest) (*model.Product, error)
 }
 
 type Controller struct {
@@ -71,7 +71,7 @@ func (c *Controller) AddProduct(ctx echo.Context) error {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
 	// add product
-	product, err := c.merchantService.AddProduct(merchantID, req)
+	product, err := c.merchantService.AddProduct(merchantID, *req)
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, err.Error())
 	}
