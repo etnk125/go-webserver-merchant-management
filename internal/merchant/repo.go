@@ -54,3 +54,15 @@ func (r *MerchantRepository) UpdateMerchantInfo(id string, req *model.UpdateMerc
 
 	return merchant, nil
 }
+func (r *MerchantRepository) AddProduct(merchantID string, product *model.Product) (*model.Product, error) {
+	merchant, err := r.GetMerchantInfo(merchantID)
+	if err != nil {
+		return nil, err
+	}
+
+	product.MerchantID = merchant.ID
+
+	r.Products[product.ID] = product
+
+	return product, nil
+}

@@ -45,3 +45,8 @@ type UpdateMerchantRequest struct {
 	Username    string `json:"username"`
 	Password    string `json:"password"`
 }
+
+type AddProductRequest struct {
+	Name  string `json:"name"`
+	Price int    `json:"price"`
+}

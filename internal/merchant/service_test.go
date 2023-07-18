@@ -61,6 +61,18 @@ func (r *MerchantRepositoryMock) UpdateMerchantInfo(id string, req *model.Update
 
 	return merchant, nil
 }
+func (r *MerchantRepositoryMock) AddProduct(merchantID string, product *model.Product) (*model.Product, error) {
+	merchant, err := r.GetMerchantInfo(merchantID)
+	if err != nil {
+		return nil, err
+	}
+
+	product.MerchantID = merchant.ID
+
+	r.Products[product.ID] = product
+
+	return product, nil
+}
 
 // -------------------------------
 func TestService_RegisterMerchant(t *testing.T) {
@@ -201,3 +213,62 @@ func TestService_UpdateMerchantInfo(t *testing.T) {
 	}
 }
 
+func TestService_AddProduct(t *testing.T) {
+	type testCase struct {
+		merchantID string
+		req        *model.AddProductRequest
+		expected   *model.Product
+		err        error
+	}
+	tcs := map[string]testCase{
+		"should return correct product info": {
+			merchantID: "test_merchant_id",
+			req: &model.AddProductRequest{
+				Name:  "test_name",
+				Price: 100,
+			},
+			expected: &model.Product{
+				Name:       "test_name",
+				Price:      100,
+				MerchantID: "test_merchant_id",
+			},
+			err: nil,
+		},
+		"should return error when merchant not found": {
+			merchantID: "not_found_id",
+			req: &model.AddProductRequest{
+				Name:  "test_name",
+				Price: 100,
+			},
+			expected: nil,
+			err:      ErrMerchantNotFound(),
+		},
+	}
+	for name, tc := range tcs {
+		t.Run(name, func(t *testing.T) {
+			repo := NewMerchantRepositoryMock()
+			repo.Merchants["test_merchant_id"] = &model.Merchant{
+				ID:          "test_merchant_id",
+				Name:        "test_name",
+				BankAccount: "test_bank_account",
+				Username:    "test_username",
+				Password:    "test_password",
+			}
+			svc := NewMerchantService(repo)
+			actual, err := svc.AddProduct(tc.merchantID, *tc.req)
+
+			// err
+			assert.Equal(t, tc.err, err)
+			// product
+			if tc.expected != nil {
+				assert.NotNil(t, actual.ID)
+				assert.Equal(t, tc.expected.Name, actual.Name)
+				assert.Equal(t, tc.expected.Price, actual.Price)
+				assert.Equal(t, tc.expected.MerchantID, actual.MerchantID)
+				return
+			}
+			assert.Equal(t, tc.expected, actual)
+
+		})
+	}
+}

@@ -11,6 +11,7 @@ type merchantService interface {
 	RegisterMerchant(req *model.RegisterMerchantRequest) (*model.Merchant, error)
 	GetMerchantInfo(id string) (*model.Merchant, error)
 	UpdateMerchantInfo(id string, req *model.UpdateMerchantRequest) error
+	AddProduct(id string, req *model.AddProductRequest) (*model.Product, error)
 }
 
 type Controller struct {
@@ -64,9 +65,17 @@ func (c *Controller) UpdateMerchantInfo(ctx echo.Context) error {
 }
 
 func (c *Controller) AddProduct(ctx echo.Context) error {
-
+	merchantID := ctx.Param("id")
+	req := new(model.AddProductRequest)
+	if err := ctx.Bind(req); err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
 	// add product
-	return ctx.JSON(http.StatusCreated, "Created")
+	product, err := c.merchantService.AddProduct(merchantID, req)
+	if err != nil {
+		return ctx.JSON(http.StatusBadRequest, err.Error())
+	}
+	return ctx.JSON(http.StatusCreated, product)
 }
 
 func (c *Controller) GetProducts(ctx echo.Context) error {

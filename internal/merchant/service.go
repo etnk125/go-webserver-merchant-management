@@ -14,6 +14,7 @@ type merchantRepo interface {
 	CreateMerchant(merchant *model.Merchant) (*model.Merchant, error)
 	GetMerchantInfo(id string) (*model.Merchant, error)
 	UpdateMerchantInfo(merchantID string, req *model.UpdateMerchantRequest) (*model.Merchant, error)
+	AddProduct(merchantID string, product *model.Product) (*model.Product, error)
 }
 
 func NewMerchantService(repo merchantRepo) *MerchantService {
@@ -50,5 +51,19 @@ func (s *MerchantService) UpdateMerchantInfo(id string, req *model.UpdateMerchan
 		return nil, err
 	}
 	return merchant, nil
+}
+func (s *MerchantService) AddProduct(merchantID string, req model.AddProductRequest) (*model.Product, error) {
+	_, err := s.repo.GetMerchantInfo(merchantID)
+	if err != nil {
+		return nil, err
+	}
 
+	product := &model.Product{
+		ID:         uuid.New().String(),
+		Name:       req.Name,
+		Price:      req.Price,
+		MerchantID: merchantID,
+	}
+
+	return s.repo.AddProduct(merchantID, product)
 }
